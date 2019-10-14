@@ -41,7 +41,7 @@ dbForProductInfo.index(productCategory, function (er, response) {
     if (er) console.log('Error creating index on product category : ' + er);
     else console.log('Index creation result on product category : ' + response.result);
 });
-//Create index on product db for userId field if not existing
+//Create index on order db for userId field if not existing
 var userId = {
     name: '_id',
     type: 'json',
@@ -77,12 +77,18 @@ app.post('/addProductDataToDB', type, function (req, res) {
 app.post('/addUserDataToDB', type, function (req, res) {
     console.log('Inside Express api to insert details about user');
     var userData = req.body.data;
-	insertUserData(userData).then(function (data) {
-	if (data.success){
-		res.json({ success: true, message: 'User data inserted successfully !', response: data.response });	
-	}else
-		res.json({ success: false, message: 'Issue inserting user data !' });				
-	});
+	getLoginDetails().then(function (data) {
+		if(data.success){
+			res.json({ success: false, message: 'User already exists with same email Id, use another Id to register !' });
+		}else{
+			insertUserData(userData).then(function (data) {
+			if (data.success){
+				res.json({ success: true, message: 'User data inserted successfully !', response: data.response });	
+			}else
+				res.json({ success: false, message: 'Issue inserting user data !' });				
+			});			
+		}
+	}
 });
 //Verify login with user email id from DB
 app.post('/verifyLogin', type, function (req, res) {
