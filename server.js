@@ -77,8 +77,8 @@ app.post('/addProductDataToDB', type, function (req, res) {
 app.post('/addUserDataToDB', type, function (req, res) {
     console.log('Inside Express api to insert details about user');
     var userData = req.body.data;
-	getLoginDetails().then(function (data) {
-		if(data.success){
+	getLoginDetails(userData._id).then(function (data) {
+		if(data.success && data.response.docs.length > 0){
 			res.json({ success: false, message: 'User already exists with same email Id, use another Id to register !' });
 		}else{
 			insertUserData(userData).then(function (data) {
@@ -88,7 +88,7 @@ app.post('/addUserDataToDB', type, function (req, res) {
 				res.json({ success: false, message: 'Issue inserting user data !' });				
 			});			
 		}
-	}
+	});
 });
 //Verify login with user email id from DB
 app.post('/verifyLogin', type, function (req, res) {
